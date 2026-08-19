@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "storeOwner", "admin", "rider"],
       default: "user",
     },
-    
+
     isActive: {
       type: Boolean,
       default: false,
