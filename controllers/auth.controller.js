@@ -6,14 +6,16 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 export const userSignUp = asyncHandler(async (req, res, next) => {
-  const validationResult = signUpSchema.safeParse(req.body);
+  // const validationResult = signUpSchema.safeParse(req.body);
 
-  if (!validationResult.success) {
-    const message = validationResult.error.errors[0].message;
-    return next(new ErrorHandler(message, 400));
-  }
+  // if (!validationResult.success) {
+  //   const message = validationResult.error.errors[0].message;
+  //   return next(new ErrorHandler(message, 400));
+  // }
 
-  const { email, firstName, lastName, password } = validationResult.data;
+  // const { email, firstName, lastName, password } = validationResult.data;
+  
+  const { email, firstName, lastName, password } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -44,14 +46,16 @@ export const userSignUp = asyncHandler(async (req, res, next) => {
 
 
 export const userLogin = asyncHandler(async (req, res, next) => {
-  const validationResult = loginSchema.safeParse(req.body);
+  // const validationResult = loginSchema.safeParse(req.body);
 
-  if (!validationResult.success) {
-    const message = validationResult.error.errors[0].message;
-    return next(new ErrorHandler(message, 400));
-  }
+  // if (!validationResult.success) {
+  //   const message = validationResult.error.errors[0].message;
+  //   return next(new ErrorHandler(message, 400));
+  // }
 
-  const { email, password } = validationResult.data;
+  // const { email, password } = validationResult.data;
+  
+  const { email, password } = req.body;
 
   const existingUser = await User.findOne({ email }).select("+password");
   if (!existingUser) {
