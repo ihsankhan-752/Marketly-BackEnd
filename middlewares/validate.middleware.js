@@ -7,5 +7,8 @@ export const validate = function(schema){
             const message = validationResult.error.errors[0].message;
             return next(new ErrorHandler(400,{message:message}));
         }
+
+        req.body = validationResult.data;
+        next();
     }
 }

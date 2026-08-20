@@ -1,8 +1,10 @@
 import ErrorHandler from "../utils/error.handler.js";
 
 export const errorMiddleware = (err, req, res, next) => {
-  err.message = err.message || "Something went wrong";
-  err.statusCode = err.statusCode || 500;
+ const message = err.message || "Something went wrong";
+  const statusCode = err.statusCode || 500;
 
-  return res.status(statusCode).json(new ErrorHandler(statusCode,{message:message}));
+  return res.status(statusCode).json({  success: false,
+        message: message,
+        errors: err.errors || [],});
 };
