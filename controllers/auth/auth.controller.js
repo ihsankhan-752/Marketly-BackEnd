@@ -1,19 +1,11 @@
-import { User } from "../models/user.model.js";
-import asyncHandler from "../utils/async.handler.js";
-import ErrorHandler from "../utils/error.handler.js";
-import { loginSchema, signUpSchema } from "../validations/auth.validation.js";
+import { User } from "../../models/user.model.js";
+import asyncHandler from "../../utils/async.handler.js";
+import ErrorHandler from "../../utils/error.handler.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 export const userSignUp = asyncHandler(async (req, res, next) => {
-  const validationResult = signUpSchema.safeParse(req.body);
-
-  if (!validationResult.success) {
-    const message = validationResult.error.errors[0].message;
-    return next(new ErrorHandler(message, 400));
-  }
-
-  const { email, firstName, lastName, password } = validationResult.data;
+  const { email, firstName, lastName, password } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -41,28 +33,15 @@ export const userSignUp = asyncHandler(async (req, res, next) => {
 });
 
 
-
-
 export const userLogin = asyncHandler(async (req, res, next) => {
-  const validationResult = loginSchema.safeParse(req.body);
-
-  if (!validationResult.success) {
-    const message = validationResult.error.errors[0].message;
-    return next(new ErrorHandler(message, 400));
-  }
-
-  const { email, password } = validationResult.data;
+  const { email, password } = req.body;
 
   const existingUser = await User.findOne({ email }).select("+password");
   if (!existingUser) {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  const isPasswordCorrect = await bcrypt.compare(
-    password,
-    existingUser.password,
-  );
-  
+  const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
   if (!isPasswordCorrect) {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
@@ -80,5 +59,35 @@ export const userLogin = asyncHandler(async (req, res, next) => {
     success: true,
     message: "User Logged In",
     token,
+  });
+});
+
+export const adminSignUp = asyncHandler(async (req, res, next) => {
+  const { email, firstName, lastName, password } = req.body;
+
+  const existingAdmin = await User.findOne({ email: email });
+
+  if (existingAdmin) {
+    return next(new ErrorHandler("Admin Already exist", 409));
+  }
+
+  const admin = await User.create({
+    email,
+    firstName,
+    lastName,
+    password,
+    role: "admin",
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: "Admin account created",
+    admin: {
+      _id: admin._id,
+      email: admin.email,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      role: admin.role,
+    },
   });
 });
