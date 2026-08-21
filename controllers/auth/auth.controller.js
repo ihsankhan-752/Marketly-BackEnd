@@ -4,6 +4,20 @@ import ErrorHandler from "../../utils/error.handler.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+
+
+
+const generateToken = (user) => {
+  const payload = {
+    _id: user._id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    role: user.role,
+  };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
 export const userSignUp = asyncHandler(async (req, res, next) => {
   const { email, firstName, lastName, password } = req.body;
 
@@ -46,15 +60,9 @@ export const userLogin = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  const payload = {
-    _id: existingUser._id,
-    email: existingUser.email,
-    firstName: existingUser.firstName,
-    lastName: existingUser.lastName,
-    role: existingUser.role,
-  };
+  const token = generateToken(existingUser);
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+
   return res.status(200).json({
     success: true,
     message: "User Logged In",
@@ -65,9 +73,9 @@ export const userLogin = asyncHandler(async (req, res, next) => {
 export const adminSignUp = asyncHandler(async (req, res, next) => {
   const { email, firstName, lastName, password } = req.body;
 
-  const existingAdmin = await User.findOne({ email: email });
+  const existingUser = await User.findOne({ email: email });
 
-  if (existingAdmin) {
+  if (existingUser) {
     return next(new ErrorHandler("Admin Already exist", 409));
   }
 
@@ -91,3 +99,4 @@ export const adminSignUp = asyncHandler(async (req, res, next) => {
     },
   });
 });
+
