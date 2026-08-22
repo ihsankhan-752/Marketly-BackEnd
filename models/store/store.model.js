@@ -1,29 +1,24 @@
 import mongoose from "mongoose";
-
+import storeStatus from "../../utils/enums.js";
 const { Schema } = mongoose;
 
 const storeSchema = new Schema(
   {
-    ownerId: {
+    owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
 
-    storeTypeId: {
+    storeType: {
       type: Schema.Types.ObjectId,
       ref: "StoreType",
       required: true,
       index: true,
     },
 
-    categoryId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      index: true,
-    },
-
+    
     name: {
       type: String,
       required: true,
@@ -67,14 +62,8 @@ const storeSchema = new Schema(
 
     status: {
       type: String,
-      enum: [
-        "pending",
-        "approved",
-        "rejected",
-        "suspended",
-        "closed",
-      ],
-      default: "pending",
+      enum: storeStatus,
+      default: storeStatus[0],
       required: true,
     },
 
