@@ -1,133 +1,118 @@
-import mongoose, { Schema } from "mongoose";
-import { storeStatus } from "../../utils/enums.js";
-const workingDaySchema = Schema({
-    isEnabled: {
-        type: Boolean,
-        default: true,
+import mongoose from "mongoose";
+
+const { Schema } = mongoose;
+
+const storeSchema = new Schema(
+  {
+    ownerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
     },
-    open: {
-        type: String,
-        required: function () {
-            return this.isEnabled;
-        },
+
+    storeTypeId: {
+      type: Schema.Types.ObjectId,
+      ref: "StoreType",
+      required: true,
+      index: true,
     },
-    close: {
-        type: String,
-        required: function () {
-            return this.isEnabled;
-        }
-    }
-})
-const storeSchema = Schema({
-    owner: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
+
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      index: true,
     },
-    storeType: {
-        type: Schema.Types.ObjectId,
-        ref: "StoreType",
-        required: true,
-    },
+
     name: {
-        type: String,
-        required: true,
-        trim: true,
+      type: String,
+      required: true,
+      trim: true,
     },
+
     slug: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
     },
+
     description: {
-        type: String,
+      type: String,
+      trim: true,
     },
+
     logo: {
-        type: String,
-        default: "",
+      type: String,
+      trim: true,
     },
+
     coverImage: {
-        type: String,
-        default: "",
+      type: String,
+      trim: true,
     },
+
     phone: {
-        type: String,
-        required: true,
-
+      type: String,
+      trim: true,
     },
+
     email: {
-        type: String,
-        default: ""
-    },
-    status: {
-        type: String,
-        enum: storeStatus,
-        default: storeStatus[0]
-    },
-    workingHours: {
-        monday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: true, open: "09:00", close: "22:00" })
-        },
-        tuesday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: true, open: "09:00", close: "22:00" })
-        },
-        wednesday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: true, open: "09:00", close: "22:00" })
-        },
-        thursday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: true, open: "09:00", close: "22:00" })
-        },
-        friday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: true, open: "09:00", close: "22:00" })
-        },
-        saturday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: true, open: "09:00", close: "22:00" })
-        },
-        sunday: {
-            type: workingDaySchema,
-            default: () => ({ isEnabled: false })
-        }
+      type: String,
+      trim: true,
+      lowercase: true,
     },
 
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "approved",
+        "rejected",
+        "suspended",
+        "closed",
+      ],
+      default: "pending",
+      required: true,
+    },
 
     rating: {
-        type: Number,
-        default: 0,
-        min: 0,
-        max: 5,
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
     },
 
     reviewCount: {
-        type: Number,
-        default: 0,
-        min: 0,
+      type: Number,
+      default: 0,
+      min: 0,
     },
 
     deliveryEnabled: {
-        type: Boolean,
-        default: true,
+      type: Boolean,
+      default: true,
+      required: true,
     },
 
     pickupEnabled: {
-        type: Boolean,
-        default: true,
+      type: Boolean,
+      default: true,
+      required: true,
     },
 
     settings: {
-        type: Schema.Types.Mixed,
-        default: {},
+      type: Schema.Types.Mixed,
+      default: () => ({}),
     },
-},
-    {
-        timestamps: true,
+  },
+  {
+    timestamps: true,
+  }
+);
 
-    })
+const Store = mongoose.model("Store", storeSchema);
 
-const StoreSchema = mongoose.model("Store",storeSchema);
-
-export default StoreSchema;
+export default Store;

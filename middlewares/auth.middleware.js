@@ -40,3 +40,12 @@ export const isAdmin = async (req, res, next) => {
 
   next();
 };
+
+
+export const isStoreOwner = (req,res,next)=>{
+  if(req.user.role !== "storeOwner") {
+    return next(new ErrorHandler("Not authorized",403));
+  }
+
+  next();
+} 
