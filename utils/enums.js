@@ -1,0 +1,1 @@
+export const storeStatus = ["pending","approved","rejected","suspended","closed"]
