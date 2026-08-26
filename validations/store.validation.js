@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { storeStatus } from "../utils/enums.js";
 
 export const createStoreValidation = z.object({
   ownerId: z.string().optional(),
@@ -83,21 +84,24 @@ const openingDayValidation = z
         "Closing time must be in HH:mm format"
       )
       .optional(),
-  })
-  .superRefine((day, ctx) => {
-    if (day.isEnabled && !day.open) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["open"],
-        message: "Opening time is required when the day is enabled",
-      });
-    }
-
-    if (day.isEnabled && !day.close) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["close"],
-        message: "Closing time is required when the day is enabled",
-      });
-    }
   });
+
+
+  const updateStoreSchema = z.object({
+  storeType: z.string().optional(),
+  category: z.string().optional(),
+  name: z.string().trim().min(1).optional(),
+  description: z.string().trim().optional(),
+  logo: z.string().optional(),
+  coverImage: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email().optional(),
+  deliveryEnabled: z.boolean().optional(),
+  pickupEnabled: z.boolean().optional(),
+  settings: z.record(z.any()).optional(),
+});
+
+
+const updateStoreStatusSchema = z.object({
+  status: z.enum(storeStatus),
+});
